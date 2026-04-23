@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FBA Lead Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-icon">📦</div>
+    <div>
+      <h1>FBA Lead Generator</h1>
+      <p class="brand-sub">Product research · Arbitrage · Private label</p>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span id="providerBadge" class="badge badge-warning">DEMO DATA</span>
+    <button class="btn btn-ghost" id="navSearch">Search</button>
+    <button class="btn btn-ghost" id="navLeads">My Leads <span id="leadCount" class="count">0</span></button>
+    <button class="btn btn-ghost" id="navCalc">Calculator</button>
+  </div>
+</header>
+
+<main class="container">
+
+  <!-- ============ SEARCH PANEL ============ -->
+  <section id="searchPanel" class="panel">
+
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-mode="all">
+        <div class="mode-tab-title">All Products</div>
+        <div class="mode-tab-sub">Browse everything</div>
+      </button>
+      <button class="mode-tab" data-mode="arbitrage">
+        <div class="mode-tab-title">Arbitrage Scanner</div>
+        <div class="mode-tab-sub">Buy low, sell high</div>
+      </button>
+      <button class="mode-tab" data-mode="wholesale">
+        <div class="mode-tab-title">Wholesale / OA</div>
+        <div class="mode-tab-sub">High volume sellers</div>
+      </button>
+      <button class="mode-tab" data-mode="private_label">
+        <div class="mode-tab-title">Private Label</div>
+        <div class="mode-tab-sub">Low competition niches</div>
+      </button>
+    </div>
+
+    <div class="filters">
+      <div class="filter-row">
+        <div class="filter-group filter-grow">
+          <label>Search products</label>
+          <input type="text" id="q" placeholder="e.g. kitchen, bluetooth, dog toy..." />
+        </div>
+        <div class="filter-group">
+          <label>Category</label>
+          <select id="category"><option value="">All categories</option></select>
+        </div>
+        <div class="filter-group">
+          <label>Sort by</label>
+          <select id="sortBy">
+            <option value="sales">Highest sold (30d)</option>
+            <option value="bsr">Best sellers rank</option>
+            <option value="trend">Trending up</option>
+            <option value="newest">Newest listings</option>
+            <option value="reviews">Most reviews</option>
+            <option value="price_asc">Price: low → high</option>
+            <option value="price_desc">Price: high → low</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row filter-row-compact">
+        <div class="filter-group">
+          <label>Min price</label>
+          <input type="number" id="minPrice" placeholder="$" min="0" />
+        </div>
+        <div class="filter-group">
+          <label>Max price</label>
+          <input type="number" id="maxPrice" placeholder="$" min="0" />
+        </div>
+        <div class="filter-group">
+          <label>Max BSR</label>
+          <input type="number" id="maxBsr" placeholder="e.g. 100000" />
+        </div>
+        <div class="filter-group">
+          <label>Min sales/mo</label>
+          <input type="number" id="minSales" placeholder="e.g. 300" />
+        </div>
+        <div class="filter-group">
+          <label>Min ROI %</label>
+          <input type="number" id="minRoi" placeholder="e.g. 30" />
+        </div>
+        <div class="filter-group">
+          <label>Max reviews</label>
+          <input type="number" id="maxReviews" placeholder="e.g. 500" />
+        </div>
+        <div class="filter-group">
+          <label>Min rating</label>
+          <select id="minRating">
+            <option value="">Any</option>
+            <option value="3">3.0+ ⭐</option>
+            <option value="3.5">3.5+ ⭐</option>
+            <option value="4">4.0+ ⭐</option>
+            <option value="4.5">4.5+ ⭐</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Seller type</label>
+          <select id="sellerType">
+            <option value="">Any</option>
+            <option value="FBA">FBA only</option>
+            <option value="FBM">FBM</option>
+            <option value="Amazon">Amazon direct</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-actions">
+        <button class="btn btn-primary" id="btnSearch">Find Leads</button>
+        <button class="btn btn-ghost" id="btnReset">Reset</button>
+        <span id="resultCount" class="result-count"></span>
+      </div>
+    </div>
+
+    <div id="resultsWrap" class="results-wrap">
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">🔍</div>
+        <h3>Ready to find your next FBA winner</h3>
+        <p>Choose a mode above and hit <strong>Find Leads</strong> to see top products, or filter by category to narrow your search.</p>
+      </div>
+      <div id="results" class="results"></div>
+    </div>
+  </section>
+
+  <!-- ============ LEADS PANEL ============ -->
+  <section id="leadsPanel" class="panel hidden">
+    <div class="panel-header">
+      <div>
+        <h2>Saved Leads</h2>
+        <p class="panel-sub">Products you're researching, sourcing, or listing</p>
+      </div>
+      <div>
+        <a class="btn btn-secondary" id="btnExport" href="/api/leads/export.csv" download>Export CSV</a>
+      </div>
+    </div>
+    <div id="leadsEmpty" class="empty-state hidden">
+      <div class="empty-icon">📋</div>
+      <h3>No saved leads yet</h3>
+      <p>Click <strong>Save Lead</strong> on any product from the Search tab to start tracking it.</p>
+    </div>
+    <div id="leadsList" class="leads-list"></div>
+  </section>
+
+  <!-- ============ CALCULATOR PANEL ============ -->
+  <section id="calcPanel" class="panel hidden">
+    <div class="panel-header">
+      <div>
+        <h2>FBA Profit Calculator</h2>
+        <p class="panel-sub">Quick ROI check for any product</p>
+      </div>
+    </div>
+
+    <div class="calc-grid">
+      <div class="calc-inputs">
+        <div class="filter-group">
+          <label>Amazon sale price ($)</label>
+          <input type="number" id="c_salePrice" step="0.01" value="29.99" />
+        </div>
+        <div class="filter-group">
+          <label>Source cost ($)</label>
+          <input type="number" id="c_sourceCost" step="0.01" value="8.50" />
+        </div>
+        <div class="filter-group">
+          <label>FBA fulfillment fee ($)</label>
+          <input type="number" id="c_fbaFee" step="0.01" value="4.75" />
+        </div>
+        <div class="filter-group">
+          <label>Referral fee %</label>
+          <select id="c_referral">
+            <option value="0.08">8% (Electronics, Baby, Grocery)</option>
+            <option value="0.12">12% (Automotive)</option>
+            <option value="0.15" selected>15% (most categories)</option>
+            <option value="0.17">17% (Apparel)</option>
+            <option value="0.20">20% (Jewelry)</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <label>Prep cost ($)</label>
+          <input type="number" id="c_prep" step="0.01" value="0.50" />
+        </div>
+        <div class="filter-group">
+          <label>Ship to Amazon ($)</label>
+          <input type="number" id="c_ship" step="0.01" value="0.75" />
+        </div>
+        <div class="filter-group">
+          <label>Misc ($)</label>
+          <input type="number" id="c_misc" step="0.01" value="0" />
+        </div>
+      </div>
+
+      <div class="calc-output" id="calcOutput">
+        <div class="calc-verdict" id="calcVerdict">Good</div>
+        <div class="calc-profit">
+          <div class="calc-profit-label">Net Profit</div>
+          <div class="calc-profit-value" id="calcProfit">$0.00</div>
+        </div>
+        <div class="calc-metrics">
+          <div><span>ROI</span><strong id="calcRoi">0%</strong></div>
+          <div><span>Margin</span><strong id="calcMargin">0%</strong></div>
+          <div><span>Break-even</span><strong id="calcBreakeven">$0</strong></div>
+        </div>
+        <div class="calc-breakdown">
+          <div class="row"><span>Sale price</span><span id="calcSale">$0</span></div>
+          <div class="row"><span>− Referral fee</span><span id="calcRef">$0</span></div>
+          <div class="row"><span>− FBA fee</span><span id="calcFba">$0</span></div>
+          <div class="row"><span>− Source + prep + ship</span><span id="calcCost">$0</span></div>
+          <div class="row row-total"><span>= Net profit</span><span id="calcProfit2">$0</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Modal for product detail -->
+<div id="modal" class="modal hidden">
+  <div class="modal-backdrop"></div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
+<div id="toast" class="toast hidden"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
