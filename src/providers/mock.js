@@ -163,6 +163,32 @@ function generateAsin(rng) {
   return asin;
 }
 
+// Generate a category-themed inline SVG placeholder (reliable, no external dependency)
+function generatePlaceholderSvg(brand, categoryId) {
+  const colors = {
+    'home-kitchen':    ['#fef3c7', '#92400e'],
+    'beauty':          ['#fce7f3', '#9f1239'],
+    'health':          ['#dcfce7', '#166534'],
+    'toys-games':      ['#fef9c3', '#854d0e'],
+    'sports-outdoors': ['#dbeafe', '#1e40af'],
+    'electronics':     ['#e0e7ff', '#3730a3'],
+    'office-products': ['#f1f5f9', '#334155'],
+    'pet-supplies':    ['#ffedd5', '#9a3412'],
+    'baby':            ['#fae8ff', '#86198f'],
+    'grocery':         ['#ecfccb', '#365314'],
+    'tools':           ['#fef2f2', '#991b1b'],
+    'automotive':      ['#f3f4f6', '#1f2937'],
+    'clothing':        ['#cffafe', '#155e75'],
+    'books':           ['#fef3c7', '#713f12'],
+    'patio-garden':    ['#d1fae5', '#065f46'],
+    'arts-crafts':     ['#fce7f3', '#831843']
+  };
+  const [bg, fg] = colors[categoryId] || ['#f1f5f9', '#334155'];
+  const letter = (brand || 'P').charAt(0).toUpperCase();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet"><rect width="200" height="200" fill="${bg}"/><text x="100" y="125" font-family="Helvetica, Arial, sans-serif" font-size="90" font-weight="700" fill="${fg}" text-anchor="middle">${letter}</text></svg>`;
+  return 'data:image/svg+xml;base64,' + Buffer.from(svg).toString('base64');
+}
+
 function generateProduct(seed, categoryId) {
   const rng = mulberry32(seed);
   const cat = CATEGORIES.find(c => c.id === categoryId) || pick(rng, CATEGORIES);
@@ -208,7 +234,7 @@ function generateProduct(seed, categoryId) {
     brand,
     category: cat.id,
     categoryName: cat.name,
-    imageUrl: `https://via.placeholder.com/200x200/1e293b/94a3b8?text=${encodeURIComponent(brand.slice(0, 12))}`,
+    imageUrl: generatePlaceholderSvg(brand, cat.id),
     amazonUrl: `https://www.amazon.com/dp/${generateAsin(rng)}`,
     price: amazonPrice,
     sourcePrice,
